@@ -25,9 +25,21 @@ export default function Component() {
             <Navbar />
             <div>
                 <h1 className="text-4xl font-bold flex items-start justify-start mx-8 mt-8"> Report an issue</h1>
-                <button onClick={()=>{navigate(-1)}} className="bg-blue-500 text-white py-2 px-6 rounded-full items-start justify-start mx-8 mt-4 hover:bg-blue-700">Go Back</button>
+                <button onClick={() => { navigate(-1) }} className="bg-blue-500 text-white py-2 px-6 rounded-full items-start justify-start mx-8 mt-4 hover:bg-blue-700">Go Back</button>
                 <hr class="h-px mx-8 my-2 bg-gray-200 border-0 dark:bg-gray-700" />
                 <section className="grid mx-8 grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-4 lg:p-6">
+                    <div className="relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
+                        <a href="/room" className="absolute inset-0 z-10" prefetch={false}>
+                            <span className="sr-only">View</span>
+                        </a>
+                        <div className="bg-card rounded-md p-4 flex items-center justify-center">
+                            <TableIcon className="w-8 h-8 text-card-foreground" />
+                        </div>
+                        <div className="p-4 bg-background">
+                            <h3 className="text-xl font-bold">Room</h3>
+                            {/* <p className="text-sm text-muted-foreground">Enjoy delectable meals in our dining area.</p> */}
+                        </div>
+                    </div>
                     <div className="relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
                         <a href="/kitchen" className="absolute inset-0 z-10" prefetch={false}>
                             <span className="sr-only">View</span>

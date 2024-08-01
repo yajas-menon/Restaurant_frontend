@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import Reception from './pages/Reception';
 import Bathroom from './pages/Bathroom';
 import Dining from './pages/Dining';
+import Room from "./pages/Room"
 
 function App() {
   return (
@@ -31,7 +32,7 @@ function App() {
         <Route exact path='/reception' element={<Reception/>}></Route>
         <Route exact path='/bathroom' element={<Bathroom/>}></Route>
         <Route exact path='/dining' element={<Dining/>}></Route>
-
+        <Route exact path='/room' element={<Room/>}></Route>
       </Routes>
     </Router>
     
