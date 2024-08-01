@@ -13,6 +13,7 @@ export default function Component() {
         const fetchIssues = async () => {
             try {
                 const response = await api.get('/api/auth/all');
+                console.log(response.data)
                 setIssues(response.data);
             } catch (error) {
                 console.error('Error fetching issues:', error);
@@ -22,29 +23,30 @@ export default function Component() {
         fetchIssues();
     }, []);
 
-    useEffect(()=>{
-        const getImage = async ()=>{
-            try {
-                const result = await api.get('/api/auth/get-images')
-                setAllImage(result.data.issuePhoto)
-                console.log(result.data)
-            } catch (error) {
-                console.error('Error fetching issues:', error);
-            }
-        }
-        getImage();
-    },[]);
+
 
     return (
         <div>
             <Navbar />
             <div>
                 <h1 className="text-4xl font-bold flex items-start justify-start mx-8 mt-8"> Report an issue</h1>
-                <button onClick={()=>{navigate(-1)}} className="bg-blue-500 text-white py-2 px-6 rounded-full items-start justify-start mx-8 mt-4 hover:bg-blue-700">Go Back</button>
+                <button onClick={() => { navigate(-1) }} className="bg-blue-500 text-white py-2 px-6 rounded-full items-start justify-start mx-8 mt-4 hover:bg-blue-700">Go Back</button>
                 <hr class="h-px mx-8 my-2 bg-gray-200 border-0 dark:bg-gray-700" />
                 <section className="grid mx-8 grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-4 lg:p-6">
                     <div className="relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
-                        <a href="/issues/kitchen" className="absolute inset-0 z-10" prefetch={false}>
+                        <a href="/issue/room" className="absolute inset-0 z-10" prefetch={false}>
+                            <span className="sr-only">View</span>
+                        </a>
+                        <div className="bg-card rounded-md p-4 flex items-center justify-center">
+                        <BedIcon className="w-8 h-8 text-card-foreground" />
+                        </div>
+                        <div className="p-4 bg-background">
+                            <h3 className="text-xl font-bold">Room</h3>
+                            <p className="text-sm text-muted-foreground">Cozy and comfortable rooms for a restful day.</p>
+                        </div>
+                    </div>
+                    <div className="relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
+                        <a href="/issue/kitchen" className="absolute inset-0 z-10" prefetch={false}>
                             <span className="sr-only">View</span>
                         </a>
                         <div className="bg-primary rounded-md p-4 flex items-center justify-center">
@@ -56,7 +58,7 @@ export default function Component() {
                         </div>
                     </div>
                     <div className="relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
-                        <a href="/issues/reception" className="absolute inset-0 z-10" prefetch={false}>
+                        <a href="/issue/reception" className="absolute inset-0 z-10" prefetch={false}>
                             <span className="sr-only">View</span>
                         </a>
                         <div className="bg-secondary rounded-md p-4 flex items-center justify-center">
@@ -68,7 +70,7 @@ export default function Component() {
                         </div>
                     </div>
                     <div className="relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
-                        <a href="/issues/bathroom" className="absolute inset-0 z-10" prefetch={false}>
+                        <a href="/issue/bathroom" className="absolute inset-0 z-10" prefetch={false}>
                             <span className="sr-only">View</span>
                         </a>
                         <div className="bg-muted rounded-md p-4 flex items-center justify-center">
@@ -80,7 +82,7 @@ export default function Component() {
                         </div>
                     </div>
                     <div className="relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
-                        <a href="/issues/dining" className="absolute inset-0 z-10" prefetch={false}>
+                        <a href="/issue/dining" className="absolute inset-0 z-10" prefetch={false}>
                             <span className="sr-only">View</span>
                         </a>
                         <div className="bg-card rounded-md p-4 flex items-center justify-center">
@@ -98,16 +100,17 @@ export default function Component() {
                     <table className="min-w-full divide-y divide-zinc-200">
                         <thead>
                             <tr>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Section Name</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Device Name</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Device Code</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Description</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Image</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
                             {issues.map((issue) => (
                                 <tr key={issue._id}>
+                                    <td className="px-6 py-4 whitespace-nowrap">{issue.sectionName}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{issue.deviceName}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{issue.deviceCode}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{issue.description}</td>
@@ -115,16 +118,6 @@ export default function Component() {
                                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${issue.status === 'Resolved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                             {issue.status}
                                         </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {allImage == null ? " No Images" :
-                                            allImage.map(data =>{
-                                            return (
-                                                <img src={require(`../images/${data.issuePhoto}`)}/>
-                                            )
-                                        }
-                                            
-                                        )}
                                     </td>
                                 </tr>
                             ))}
@@ -135,6 +128,28 @@ export default function Component() {
         </div>
     )
 }
+
+function BedIcon(props) {
+    return (
+      <svg
+        {...props}
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M2 4v16" />
+        <path d="M2 8h18a2 2 0 0 1 2 2v10" />
+        <path d="M2 17h20" />
+        <path d="M6 8v9" />
+      </svg>
+    )
+  }
 
 function BathIcon(props) {
     return (

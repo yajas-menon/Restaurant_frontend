@@ -205,7 +205,7 @@ const Login = () => {
             )}
           </div>
         </div>
-        <div className="hidden md:flex md:flex-1 md:items-center md:justify-center bg-[#5a5eb9] text-white p-10">
+        <div className="hidden md:flex md:flex-1 md:items-center md:justify-center bg-blue-700 hover:bg-blue-800 text-white p-10">
           <div>
             <div className="flex items-center mb-6">
               <h1 className="text-2xl font-bold">InnuxAI</h1>

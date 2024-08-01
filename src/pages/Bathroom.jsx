@@ -1,5 +1,5 @@
 import React from 'react'
-import bathroom from '../assets/bathroom-image.jpg'
+// import bathroom from '../assets/bathroom-image.jpg'
 import Navbar from '../components/Navbar'
 
 const Bathroom = () => {
@@ -7,7 +7,7 @@ const Bathroom = () => {
     <div>
     <Navbar/>
 <div className="flex">
-    <img src={bathroom} aria-hidden alt='vendor image' className="w-1/2 h-screen object-cover" />
+    {/* <img src={bathroom} aria-hidden alt='vendor image' className="w-1/2 h-screen object-cover" /> */}
 
     <div className="min-h-screen w-1/2 flex items-center justify-center bg-white">
       <div className="bg-white border border-slate-800 p-8 rounded-lg shadow-lg w-3/4 max-w-2xl">

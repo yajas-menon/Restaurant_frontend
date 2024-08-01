@@ -1,129 +1,203 @@
-import React , {useState} from 'react'
+import React, { useState } from 'react'
 import kitchen from '../assets/kitchen-image.jpg'
 import Navbar from '../components/Navbar'
 import api from '../utils/api';
-import { useNavigate , useParams} from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import { ReactMediaRecorder } from 'react-media-recorder';
+import { Audio } from 'react-loader-spinner'
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const Issues = () => {
-  const [formData, setFormData] = useState({
-    faultType: '',
-    deviceName: '',
-    deviceCode: '',
-    description: '',
-    issuePhoto: null,
-  });
-  const navigate = useNavigate();
-  const params = useParams();
+    const params = useParams(); // Extract sectionName from URL parameters
+    const [audioBlob, setAudioBlob] = useState(null);
+    const [isRecording, setIsRecording] = useState(false);
+    const [gettingText, setGettingText] = useState(false);
+    const [formData, setFormData] = useState({
+        faultType: '',
+        deviceName: '',
+        deviceCode: '',
+        description: '',
+        issuePhoto: null,
+    });
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    const handleStop = (blobUrl, blob) => {
+        setAudioBlob(blob);
+        // Optionally, you can play the recorded audio
+        // const audio = new Audio(blobUrl);
+        // audio.play();
+        console.log("rec stopped")
+        sendAudioToBackend(blob);
+    };
 
-  const handleFileChange = (e) => {
-    setFormData({ ...formData, issuePhoto: e.target.files[0] });
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const data = new FormData();
-    data.append('sectionName',params.id);
-    data.append('faultType', formData.faultType);
-    data.append('deviceName', formData.deviceName);
-    data.append('deviceCode', formData.deviceCode);
-    data.append('description', formData.description);
-    data.append('issuePhoto', formData.issuePhoto);
+    const sendAudioToBackend = async (blob) => {
+        console.log("sending audio...");
+        setGettingText(true)
+        if (!blob) return;
 
-    try {
-      const response = await api.post('/api/auth/create', data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      console.log('Issue submitted successfully:', response.data);
-      alert("success");
-    } catch (error) {
-      console.error('Error submitting issue:', error);
-    }
-  };
-  return (
-    <div>
-    <Navbar />
-    <div className="flex">
-      <img src={kitchen} aria-hidden alt="vendor image" className="w-1/2 h-screen object-cover" />
+        const formData = new FormData();
+        formData.append('audio', blob, 'recording.wav');
 
-      <div className="min-h-screen w-1/2 flex items-center justify-center bg-white">
-        <div className="bg-white border border-slate-800 p-8 rounded-lg shadow-lg w-3/4 max-w-2xl">
-          <h2 className="text-4xl font-bold text-center text-zinc-900">{params.id} Issues</h2>
-          <p className="text-center text-zinc-600 mb-6 mt-2">Fill out the issues related to {params.id}.</p>
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-              <div className="mb-4">
-                <label htmlFor="faultType" className="block text-zinc-700">Type of fault?</label>
-                <input
-                  type="text"
-                  name="faultType"
-                  placeholder="Enter the type of fault"
-                  className="w-full px-3 py-2 border border-zinc-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                  value={formData.faultType}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="deviceName" className="block text-zinc-700">Device Name</label>
-                <input
-                  type="text"
-                  name="deviceName"
-                  placeholder="Enter the device name"
-                  className="w-full px-3 py-2 border border-zinc-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                  value={formData.deviceName}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="deviceCode" className="block text-zinc-700">Device Code</label>
-                <input
-                  type="text"
-                  name="deviceCode"
-                  placeholder="Enter the device code"
-                  className="w-full px-3 py-2 border border-zinc-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                  value={formData.deviceCode}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="description" className="block text-zinc-700">Description</label>
-                <input
-                  type="text"
-                  name="description"
-                  placeholder="Explain the issue"
-                  className="w-full px-3 py-2 border border-zinc-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                  value={formData.description}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="issuePhoto" className="block text-zinc-700">Photo of issue</label>
-                <input
-                  type="file"
-                  name="issuePhoto"
-                  className="w-full px-3 py-2 border border-zinc-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                />
-              </div>
+        try {
+            const response = await fetch('http://localhost:5000/sendaudio', {
+                method: 'POST',
+                body: formData,
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setFormData(prevData => ({
+                    ...prevData,
+                    faultType: data.faultType,
+                    deviceName: data.deviceName,
+                    deviceCode: data.deviceCode,
+                    description: data.description,
+                }));
+            } else {
+                console.error('Failed to send audio.');
+            }
+        } catch (error) {
+            console.error('Error sending audio:', error);
+        } finally {
+            setGettingText(false);
+        }
+    };
+
+    const handleRecordingClick = () => {
+        if (!isRecording) {
+            setIsRecording(true);
+        } else {
+            setIsRecording(false);
+            sendAudioToBackend();
+        }
+    };
+
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const handleFileChange = (e) => {
+        setFormData({ ...formData, issuePhoto: e.target.files[0] });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const payload = {
+            ...formData,
+        };
+
+        const formDataToSend = new FormData();
+        formDataToSend.append('faultType', formData.faultType);
+        formDataToSend.append('deviceName', formData.deviceName);
+        formDataToSend.append('deviceCode', formData.deviceCode);
+        formDataToSend.append('description', formData.description);
+        formDataToSend.append('issuePhoto', formData.issuePhoto);
+        formDataToSend.append('sectionName', params.id);
+
+        try {
+            await api.post('/api/auth/create', formDataToSend, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            toast.success("Issue submitted successfully, Thanks!")
+            setFormData({
+                faultType: '',
+                deviceName: '',
+                deviceCode: '',
+                description: '',
+                issuePhoto: null,
+            });
+        } catch (error) {
+            console.error('Error submitting complaint:', error);
+            alert('Failed to submit complaint. Please try again.');
+        }
+    };
+
+    return <div>
+        <Navbar />
+        <div className="flex">
+            <img src={kitchen} aria-hidden alt="vendor image" className="w-1/2 h-screen object-cover" />
+            <div className="min-h-screen w-1/2 flex items-center justify-center bg-white">
+                <div className="bg-white p-8 rounded-lg shadow-lg w-3/4 max-w-2xl">
+                    <form className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg" onSubmit={handleSubmit}>
+                        <h2 className="text-2xl font-semibold mb-6 text-center">Lodge a Complaint</h2>
+                        <div className="mb-4">
+                            <label htmlFor="complaint" className="block mb-2 text-sm font-medium text-gray-900">Type of Fault?</label>
+                            <input placeholder="connection" type="text" id="complaint" name="faultType" value={formData.faultType} onChange={handleChange} className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="roomNumber" className="block mb-2 text-sm font-medium text-gray-900">Device Name</label>
+                            <input placeholder='WiFi' type="text" id="roomNumber" name="deviceName" value={formData.deviceName} onChange={handleChange} className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="area" className="block mb-2 text-sm font-medium text-gray-900">Device Code</label>
+                            <input placeholder='123' type="text" id="area" name="deviceCode" value={formData.deviceCode} onChange={handleChange} className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900">Detailed Description</label>
+                            <textarea placeholder='Not able to connect to WiFi in room no 303'id="description" name="description" value={formData.description} onChange={handleChange} className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required></textarea>
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="issuePhoto" className="block mb-2 text-sm font-medium text-gray-900">Photo of issue</label>
+                            <input
+                                type="file"
+                                name="issuePhoto"
+                                className="w-full px-3 py-2 border border-zinc-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                            />
+                        </div>
+                        <button type="submit" className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Submit Complaint</button>
+                        <div className="relative my-8">
+                                <hr className="border-gray-300"/>
+                                <span className="absolute left-1/2 transform -translate-x-1/2 bg-white px-2 text-gray-500">OR</span>
+                            </div>
+                        <ReactMediaRecorder
+                            audio
+                            onStop={handleStop}
+                            render={({ status, startRecording, stopRecording }) => (
+                                <div>
+                                    <div className="mb-4">
+                                        <button onClick={() => {
+                                            if (!isRecording) {
+                                                startRecording();
+                                            } else {
+                                                stopRecording();
+                                            }
+                                            handleRecordingClick();
+                                        }} type="button" style={{ display: 'flex', justifyContent: 'center' }} className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-2">
+                                            {
+                                                gettingText ? <Audio
+                                                    height="16"
+                                                    width="80"
+                                                    radius="9"
+                                                    color="white"
+                                                    ariaLabel="loading"
+                                                    wrapperStyle
+                                                    wrapperClass
+                                                />
+                                                    :
+                                                    (
+                                                        isRecording ? 'Stop recording'
+                                                            :
+                                                            'Fill by voice'
+                                                    )
+                                            }
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        />
+
+                    </form>
+                </div>
             </div>
-            <div className="flex justify-between">
-            <button onClick={()=>{navigate(-1)}} className="w-44 bg-blue-500 rounded-full text-white text-primary-foreground py-2 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary">Go Back</button>
-              <button type="submit" className="w-44 bg-black text-white rounded-full text-primary-foreground py-2 hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary">
-                Submit
-              </button>
-            </div>
-          </form>
         </div>
-      </div>
     </div>
-  </div>
-  )
 }
 
 export default Issues
