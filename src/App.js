@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import Reception from './pages/Reception';
 import Bathroom from './pages/Bathroom';
 import Dining from './pages/Dining';
+import Issues from './pages/issues';
 
 function App() {
   return (
@@ -27,10 +28,11 @@ function App() {
         <Route exact path='/dashboard' element={<Dashboard/>}></Route>
         <Route exact path='/login' element={<Login />}></Route>
         <Route exact path='/sections' element={<Section/>}></Route>
-        <Route exact path='/kitchen' element={<Kitchen/>}></Route>
+        {/* <Route exact path='/kitchen' element={<Kitchen/>}></Route>
         <Route exact path='/reception' element={<Reception/>}></Route>
         <Route exact path='/bathroom' element={<Bathroom/>}></Route>
-        <Route exact path='/dining' element={<Dining/>}></Route>
+        <Route exact path='/dining' element={<Dining/>}></Route> */}
+        <Route exact path='/issues/:id' element={<Issues/>}></Route>
 
       </Routes>
     </Router>

@@ -3,8 +3,10 @@ import Navbar from "../components/Navbar"
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
+
 export default function Component() {
     const [issues, setIssues] = useState([]);
+    const [allImage,setAllImage] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -20,6 +22,19 @@ export default function Component() {
         fetchIssues();
     }, []);
 
+    useEffect(()=>{
+        const getImage = async ()=>{
+            try {
+                const result = await api.get('/api/auth/get-images')
+                setAllImage(result.data.issuePhoto)
+                console.log(result.data)
+            } catch (error) {
+                console.error('Error fetching issues:', error);
+            }
+        }
+        getImage();
+    },[]);
+
     return (
         <div>
             <Navbar />
@@ -29,7 +44,7 @@ export default function Component() {
                 <hr class="h-px mx-8 my-2 bg-gray-200 border-0 dark:bg-gray-700" />
                 <section className="grid mx-8 grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-4 lg:p-6">
                     <div className="relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
-                        <a href="/kitchen" className="absolute inset-0 z-10" prefetch={false}>
+                        <a href="/issues/kitchen" className="absolute inset-0 z-10" prefetch={false}>
                             <span className="sr-only">View</span>
                         </a>
                         <div className="bg-primary rounded-md p-4 flex items-center justify-center">
@@ -41,7 +56,7 @@ export default function Component() {
                         </div>
                     </div>
                     <div className="relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
-                        <a href="/reception" className="absolute inset-0 z-10" prefetch={false}>
+                        <a href="/issues/reception" className="absolute inset-0 z-10" prefetch={false}>
                             <span className="sr-only">View</span>
                         </a>
                         <div className="bg-secondary rounded-md p-4 flex items-center justify-center">
@@ -53,7 +68,7 @@ export default function Component() {
                         </div>
                     </div>
                     <div className="relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
-                        <a href="/bathroom" className="absolute inset-0 z-10" prefetch={false}>
+                        <a href="/issues/bathroom" className="absolute inset-0 z-10" prefetch={false}>
                             <span className="sr-only">View</span>
                         </a>
                         <div className="bg-muted rounded-md p-4 flex items-center justify-center">
@@ -65,7 +80,7 @@ export default function Component() {
                         </div>
                     </div>
                     <div className="relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
-                        <a href="/dining" className="absolute inset-0 z-10" prefetch={false}>
+                        <a href="/issues/dining" className="absolute inset-0 z-10" prefetch={false}>
                             <span className="sr-only">View</span>
                         </a>
                         <div className="bg-card rounded-md p-4 flex items-center justify-center">
@@ -87,6 +102,7 @@ export default function Component() {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Device Code</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Description</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Image</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
@@ -99,6 +115,16 @@ export default function Component() {
                                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${issue.status === 'Resolved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                             {issue.status}
                                         </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {allImage == null ? " No Images" :
+                                            allImage.map(data =>{
+                                            return (
+                                                <img src={require(`../images/${data.issuePhoto}`)}/>
+                                            )
+                                        }
+                                            
+                                        )}
                                     </td>
                                 </tr>
                             ))}
