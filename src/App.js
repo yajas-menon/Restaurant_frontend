@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Slide, ToastContainer } from "react-toastify";
@@ -11,6 +10,7 @@ import Bathroom from './pages/Bathroom';
 import Dining from './pages/Dining';
 import Room from "./pages/Room"
 import Issues from './pages/issues';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -34,6 +34,7 @@ function App() {
         {/* <Route exact path='/bathroom' element={<Bathroom/>}></Route> */}
         {/* <Route exact path='/dining' element={<Dining/>}></Route> */}
         <Route exact path='/issue/:id' element={<Issues/>}></Route>
+        <Route exact path='/admindashboard' element={<AdminDashboard/>}></Route>
         {/* <Route exact path='/room' element={<Room/>}></Route> */}
 
       </Routes>

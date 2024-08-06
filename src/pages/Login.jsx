@@ -59,6 +59,8 @@ const Login = () => {
           login(role);
           if(role === "User"){
             navigate("/dashboard");
+          }else if (role === "Admin"){
+            navigate("/admindashboard")
           }
 
         // Redirect or update the UI to indicate the user is logged in

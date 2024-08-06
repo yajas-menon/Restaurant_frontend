@@ -2,19 +2,33 @@ import React, { useState, useEffect } from "react"
 import Navbar from "../components/Navbar"
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 
 export default function Component() {
     const [issues, setIssues] = useState([]);
-    const [allImage,setAllImage] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedIssueId, setSelectedIssueId] = useState(null);
     const navigate = useNavigate();
+
+    // useEffect(() => {
+    //     const fetchIssues = async () => {
+    //         try {
+    //             const response = await api.get('/api/auth/all');
+    //             setIssues(response.data.data);
+    //         } catch (error) {
+    //             console.error('Error fetching issues:', error);
+    //         }
+    //     };
+
+    //     fetchIssues();
+    // }, []);
 
     useEffect(() => {
         const fetchIssues = async () => {
             try {
                 const response = await api.get('/api/auth/all');
-                console.log(response.data)
-                setIssues(response.data);
+                setIssues(response.data.data);
             } catch (error) {
                 console.error('Error fetching issues:', error);
             }
@@ -22,14 +36,34 @@ export default function Component() {
 
         fetchIssues();
     }, []);
+    
 
+    const handleFileChange = (event) => {
+        setSelectedFile(event.target.files[0]);
+    };
 
+    const handleUpload = async (issueId) => {
+        if (!selectedFile) return;
+
+        const formData = new FormData();
+        formData.append('resolvedPhoto', selectedFile);
+
+        try {
+            await api.post(`/api/auth/resolve/${issueId}`, formData);
+            toast.success('Photo uploaded successfully!Please wait while the admin reviews and approves it');
+            // Optionally, fetch issues again to update the list
+            const response = await api.get('/api/auth/all');
+            setIssues(response.data.data);
+        } catch (error) {
+            console.error('Error uploading photo:', error);
+        }
+    };
 
     return (
         <div>
             <Navbar />
             <div>
-                <h1 className="text-4xl font-bold flex items-start justify-start mx-8 mt-8"> Report an issue</h1>
+                <h1 className="text-4xl font-bold flex items-start justify-start mx-8 mt-28"> Report an issue</h1>
                 <button onClick={() => { navigate(-1) }} className="bg-blue-500 text-white py-2 px-6 rounded-full items-start justify-start mx-8 mt-4 hover:bg-blue-700">Go Back</button>
                 <hr class="h-px mx-8 my-2 bg-gray-200 border-0 dark:bg-gray-700" />
                 <section className="grid mx-8 grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-4 lg:p-6">
@@ -38,7 +72,7 @@ export default function Component() {
                             <span className="sr-only">View</span>
                         </a>
                         <div className="bg-card rounded-md p-4 flex items-center justify-center">
-                        <BedIcon className="w-8 h-8 text-card-foreground" />
+                            <BedIcon className="w-8 h-8 text-card-foreground" />
                         </div>
                         <div className="p-4 bg-background">
                             <h3 className="text-xl font-bold">Room</h3>
@@ -105,23 +139,29 @@ export default function Component() {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Device Code</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Description</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Image After Repair</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
-                            {issues.map((issue) => (
+                            {issues.map(issue => (
                                 <tr key={issue._id}>
                                     <td className="px-6 py-4 whitespace-nowrap">{issue.sectionName}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{issue.deviceName}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{issue.deviceCode}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{issue.description}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${issue.status === 'Resolved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${issue.status === 'Resolved' ? 'bg-green-100 text-green-800' : issue.status === 'Rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
                                             {issue.status}
                                         </span>
                                     </td>
+                                    {issue.status !== 'Resolved' && <td className="px-6 py-4 whitespace-nowrap">
+                                        <input type="file" onChange={handleFileChange} />
+                                        <button onClick={() => handleUpload(issue._id)} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Upload Resolved Photo</button>
+                                    </td>
+                                    }   
                                 </tr>
                             ))}
-                        </tbody>
+                        </tbody>    
                     </table>
                 </div>
             </div>
@@ -131,25 +171,25 @@ export default function Component() {
 
 function BedIcon(props) {
     return (
-      <svg
-        {...props}
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M2 4v16" />
-        <path d="M2 8h18a2 2 0 0 1 2 2v10" />
-        <path d="M2 17h20" />
-        <path d="M6 8v9" />
-      </svg>
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M2 4v16" />
+            <path d="M2 8h18a2 2 0 0 1 2 2v10" />
+            <path d="M2 17h20" />
+            <path d="M6 8v9" />
+        </svg>
     )
-  }
+}
 
 function BathIcon(props) {
     return (
