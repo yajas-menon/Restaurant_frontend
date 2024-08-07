@@ -46,9 +46,13 @@ const Login = () => {
         } catch (err) {
           setLoading(false)
           console.error(err);
+          if (err.response && err.response.data && err.response.data.msg === 'Admin already exists') {
+            toast.error("Admin already exists. Registration failed.");
+        }else {
           toast.error("Error during registration. Please try again.");
         }
-      };
+      }
+    }
     const handleLogin = async () => {
       try {
         setLoading(true)
