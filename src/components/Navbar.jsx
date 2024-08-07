@@ -33,7 +33,7 @@ const Navbar = () => {
 
     return (
         <div>
-            <nav className="border-gray-200 bg-gray-900 fixed top-0 w-full">
+            <nav className="border-gray-200 bg-gray-900 fixed top-0 w-full ">
                 <div className="flex flex-wrap items-center justify-between mx-8 p-4">
                     <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
                         <img src={mainlogo} className="w-10 h-10 rounded-full" alt="Hotel Management Logo" />
@@ -65,6 +65,8 @@ const Navbar = () => {
                     </button>
                     <div className="hidden w-full md:block md:w-auto" id="navbar-default">
                         <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+                        {userRole !== 'Admin' &&
+                        <>
                             <li>
                                 <a
                                     href="/dashboard"
@@ -82,6 +84,8 @@ const Navbar = () => {
                                     Services
                                 </a>
                             </li>
+                            </>
+}
                             <div className="relative" ref={dropdownRef}>
                                 <button onClick={toggleDropdown} className="flex items-center space-x-2">
                                     <img src={UserIcon} className="cursor-pointer h-6 w-6 inline" alt="User Icon" />

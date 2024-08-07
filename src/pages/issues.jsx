@@ -7,6 +7,7 @@ import { ReactMediaRecorder } from 'react-media-recorder';
 import { Audio } from 'react-loader-spinner'
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loader from '../components/Loader';
 
 
 const Issues = () => {
@@ -21,6 +22,7 @@ const Issues = () => {
         description: '',
         issuePhoto: null,
     });
+    const [loading, setLoading] = useState(false);
 
     const handleStop = (blobUrl, blob) => {
         setAudioBlob(blob);
@@ -41,11 +43,13 @@ const Issues = () => {
         formData.append('audio', blob, 'recording.wav');
 
         try {
-            const response = await fetch('http://localhost:5000/sendaudio', {
+            setLoading(true)
+            const response = await fetch('https://speechtotext-fhecc2bxhhcqg2e0.eastus-01.azurewebsites.net/sendaudio', {
                 method: 'POST',
                 body: formData,
             });
             if (response.ok) {
+                setLoading(false)
                 const data = await response.json();
                 setFormData(prevData => ({
                     ...prevData,
@@ -58,8 +62,10 @@ const Issues = () => {
                 console.error('Failed to send audio.');
             }
         } catch (error) {
+            setLoading(false)
             console.error('Error sending audio:', error);
         } finally {
+            setLoading(false);
             setGettingText(false);
         }
     };
@@ -98,11 +104,13 @@ const Issues = () => {
         formDataToSend.append('sectionName', params.id);
 
         try {
+            setLoading(true)
             await api.post('/api/auth/create', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
+            setLoading(false)
             toast.success("Issue submitted successfully, Thanks!")
             setFormData({
                 faultType: '',
@@ -112,6 +120,7 @@ const Issues = () => {
                 issuePhoto: null,
             });
         } catch (error) {
+            setLoading(false)
             console.error('Error submitting complaint:', error);
             alert('Failed to submit complaint. Please try again.');
         }
@@ -119,7 +128,8 @@ const Issues = () => {
 
     return <div>
         <Navbar />
-        <div className="flex">
+        <Loader isLoading={loading}/>
+        <div className="flex mt-16">
             <img src={kitchen} aria-hidden alt="vendor image" className="w-1/2 h-screen object-cover" />
             <div className="min-h-screen w-1/2 flex items-center justify-center bg-white">
                 <div className="bg-white p-8 rounded-lg shadow-lg w-3/4 max-w-2xl">

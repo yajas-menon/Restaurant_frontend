@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react'
 import api from '../utils/api'
 import Navbar from '../components/Navbar';
 import { toast } from 'react-toastify';
+import Loader from '../components/Loader';
 
 const AdminDashboard = () => {
     const [issues, setIssues] = useState([]);
+    const [loading, setLoading] = useState(false);
     useEffect(() => {
         const fetchIssues = async () => {
             try {
@@ -21,11 +23,14 @@ const AdminDashboard = () => {
 
     const handleStatusUpdate = async (issueId, status) => {
         try {
+            setLoading(true)
             await api.post(`/api/auth/update-status/${issueId}`, { status });
+            setLoading(false)
             toast.success(`Issue ${status.toLowerCase()} successfully!`);
             const response = await api.get('/api/auth/all');
             setIssues(response.data.data);
         } catch (error) {
+            setLoading(false)
             toast.error(`Error updating status to ${status}:`, error);
         }
     };
@@ -33,7 +38,8 @@ const AdminDashboard = () => {
         <div>
             
             <Navbar />
-            <div className="mx-8 bg-background p-4 rounded-lg shadow-md">
+            <Loader isLoading={loading}/>
+            <div className="mx-8 mt-28 bg-background p-4 rounded-lg shadow-md">
                 <h1 className='text-4xl font-medium'>Maintenance Tasks</h1>
                 <p className='text-gray-500'>Review and approve maintenance tasks.</p>
                 <table className="min-w-full divide-y divide-zinc-200 mt-8">

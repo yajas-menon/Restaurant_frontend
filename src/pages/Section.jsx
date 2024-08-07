@@ -3,12 +3,14 @@ import Navbar from "../components/Navbar"
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import Loader from '../components/Loader'
 
 
 export default function Component() {
     const [issues, setIssues] = useState([]);
     const [selectedFile, setSelectedFile] = useState(null);
     const [selectedIssueId, setSelectedIssueId] = useState(null);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     // useEffect(() => {
@@ -49,12 +51,15 @@ export default function Component() {
         formData.append('resolvedPhoto', selectedFile);
 
         try {
+            setLoading(true)
             await api.post(`/api/auth/resolve/${issueId}`, formData);
-            toast.success('Photo uploaded successfully!Please wait while the admin reviews and approves it');
+            setLoading(false)
+            toast.success('Photo uploaded successfully! Please wait while the admin reviews and approves it');
             // Optionally, fetch issues again to update the list
             const response = await api.get('/api/auth/all');
             setIssues(response.data.data);
         } catch (error) {
+            setLoading(false)
             console.error('Error uploading photo:', error);
         }
     };
@@ -62,6 +67,7 @@ export default function Component() {
     return (
         <div>
             <Navbar />
+            <Loader isLoading={loading}/>
             <div>
                 <h1 className="text-4xl font-bold flex items-start justify-start mx-8 mt-28"> Report an issue</h1>
                 <button onClick={() => { navigate(-1) }} className="bg-blue-500 text-white py-2 px-6 rounded-full items-start justify-start mx-8 mt-4 hover:bg-blue-700">Go Back</button>

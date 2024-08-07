@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ const Login = () => {
         role: "",
       });
       const { login } = useAuth();
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setFormData({
@@ -26,6 +28,7 @@ const Login = () => {
 
       const handleRegister = async () => {
         try {
+          setLoading(true)
           const res = await api.post('/api/auth/register', {
             name: formData.name,
             email: formData.email,
@@ -35,17 +38,20 @@ const Login = () => {
     
           localStorage.setItem('token', res.data.token);
           setMode("login");
+          setLoading(false)
           toast.success("Registration successful. Please login")
           
           
           // Redirect or update the UI to indicate the user is registered and logged in
         } catch (err) {
+          setLoading(false)
           console.error(err);
           toast.error("Error during registration. Please try again.");
         }
       };
     const handleLogin = async () => {
       try {
+        setLoading(true)
         const res = await api.post('/api/auth/login', {
           email: formData.email,
           password: formData.password,
@@ -54,17 +60,21 @@ const Login = () => {
         localStorage.setItem('token', res.data.token);
         
         console.log(res.data.user.role)
-        toast.success("Login successful");
+        // toast.success("Login successful");
         const role = res.data.user.role;
           login(role);
+          setLoading(false)
           if(role === "User"){
             navigate("/dashboard");
+            toast.success("Login sucessful as User")
           }else if (role === "Admin"){
             navigate("/admindashboard")
+            toast.success("Login sucessful as Admin")
           }
 
         // Redirect or update the UI to indicate the user is logged in
       } catch (err) {
+        setLoading(false)
         toast.error("Invalid email or password")
         console.error(err);
       }
@@ -72,6 +82,7 @@ const Login = () => {
     
   return (
     <div>
+      <Loader isLoading={loading}/>
       <div className="flex min-h-screen">
         <div className="flex flex-1 items-center justify-center p-6 sm:p-12 md:w-1/2">
           <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-xl">
