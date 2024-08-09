@@ -47,7 +47,7 @@ const Login = () => {
           setLoading(false)
           console.error(err);
           if (err.response && err.response.data && err.response.data.msg === 'Admin already exists') {
-            toast.error("Admin already exists. Registration failed.");
+            toast.error("Admin already exists. There can only be one admin.");
         }else {
           toast.error("Error during registration. Please try again.");
         }
@@ -227,7 +227,7 @@ const Login = () => {
             <div className="flex items-center mb-6">
               <h1 className="text-2xl font-bold">InnuxAI</h1>
             </div>
-            <h2 className="text-4xl font-bold mb-6">Your AI Partner for Contract and Vendor Service Management</h2>
+            <h2 className="text-4xl font-bold mb-6">Your AI Partner for Streamlined Hotel Management </h2>
             <p className="text-lg">Streamline your workflows and enhance productivity with our AI-powered solutions.</p>
           </div>
         </div>

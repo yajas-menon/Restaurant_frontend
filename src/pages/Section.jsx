@@ -38,7 +38,7 @@ export default function Component() {
 
         fetchIssues();
     }, []);
-    
+
 
     const handleFileChange = (event) => {
         setSelectedFile(event.target.files[0]);
@@ -67,7 +67,7 @@ export default function Component() {
     return (
         <div>
             <Navbar />
-            <Loader isLoading={loading}/>
+            <Loader isLoading={loading} />
             <div>
                 <h1 className="text-4xl font-bold flex items-start justify-start mx-8 mt-28"> Report an issue</h1>
                 <button onClick={() => { navigate(-1) }} className="bg-blue-500 text-white py-2 px-6 rounded-full items-start justify-start mx-8 mt-4 hover:bg-blue-700">Go Back</button>
@@ -151,23 +151,25 @@ export default function Component() {
                         <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
                             {issues.map(issue => (
                                 <tr key={issue._id}>
-                                    <td className="px-6 py-4 whitespace-nowrap">{issue.sectionName}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{issue.deviceName}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{issue.deviceCode}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{issue.description}</td>
+                                    <td className="px-6 py-4 max-w-xs break-words">{issue.sectionName}</td>
+                                    <td className="px-6 py-4 max-w-xs break-words">{issue.deviceName}</td>
+                                    <td className="px-6 py-4 max-w-xs break-words">{issue.deviceCode}</td>
+                                    <td className="px-6 py-4 max-w-xs break-words">{issue.description}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${issue.status === 'Resolved' ? 'bg-green-100 text-green-800' : issue.status === 'Rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
                                             {issue.status}
                                         </span>
                                     </td>
-                                    {issue.status !== 'Resolved' && <td className="px-6 py-4 whitespace-nowrap">
-                                        <input type="file" onChange={handleFileChange} />
-                                        <button onClick={() => handleUpload(issue._id)} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Upload Resolved Photo</button>
-                                    </td>
-                                    }   
+                                    {issue.status !== 'Resolved' && (
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <input type="file" onChange={handleFileChange} />
+                                            <button onClick={() => handleUpload(issue._id)} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Upload Resolved Photo</button>
+                                        </td>
+                                    )}
                                 </tr>
                             ))}
-                        </tbody>    
+                        </tbody>
+
                     </table>
                 </div>
             </div>
