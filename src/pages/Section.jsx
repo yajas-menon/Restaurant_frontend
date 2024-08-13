@@ -7,9 +7,7 @@ import Loader from '../components/Loader'
 
 
 export default function Component() {
-    const [issues, setIssues] = useState([]);
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [selectedIssueId, setSelectedIssueId] = useState(null);
+    
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -26,43 +24,13 @@ export default function Component() {
     //     fetchIssues();
     // }, []);
 
-    useEffect(() => {
-        const fetchIssues = async () => {
-            try {
-                const response = await api.get('/api/auth/all');
-                setIssues(response.data.data);
-            } catch (error) {
-                console.error('Error fetching issues:', error);
-            }
-        };
+    
 
-        fetchIssues();
-    }, []);
+    
 
+    
 
-    const handleFileChange = (event) => {
-        setSelectedFile(event.target.files[0]);
-    };
-
-    const handleUpload = async (issueId) => {
-        if (!selectedFile) return;
-
-        const formData = new FormData();
-        formData.append('resolvedPhoto', selectedFile);
-
-        try {
-            setLoading(true)
-            await api.post(`/api/auth/resolve/${issueId}`, formData);
-            setLoading(false)
-            toast.success('Photo uploaded successfully! Please wait while the admin reviews and approves it');
-            // Optionally, fetch issues again to update the list
-            const response = await api.get('/api/auth/all');
-            setIssues(response.data.data);
-        } catch (error) {
-            setLoading(false)
-            console.error('Error uploading photo:', error);
-        }
-    };
+   
 
     return (
         <div>
@@ -74,7 +42,7 @@ export default function Component() {
                 <hr class="h-px mx-8 my-2 bg-gray-200 border-0 dark:bg-gray-700" />
                 <section className="grid mx-8 grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-4 lg:p-6">
                     <div className="relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
-                        <a href="/issue/room" className="absolute inset-0 z-10" prefetch={false}>
+                        <a href="/issue/Room" className="absolute inset-0 z-10" prefetch={false}>
                             <span className="sr-only">View</span>
                         </a>
                         <div className="bg-card rounded-md p-4 flex items-center justify-center">
@@ -86,7 +54,7 @@ export default function Component() {
                         </div>
                     </div>
                     <div className="relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
-                        <a href="/issue/kitchen" className="absolute inset-0 z-10" prefetch={false}>
+                        <a href="/issue/Kitchen" className="absolute inset-0 z-10" prefetch={false}>
                             <span className="sr-only">View</span>
                         </a>
                         <div className="bg-primary rounded-md p-4 flex items-center justify-center">
@@ -98,7 +66,7 @@ export default function Component() {
                         </div>
                     </div>
                     <div className="relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
-                        <a href="/issue/reception" className="absolute inset-0 z-10" prefetch={false}>
+                        <a href="/issue/Reception" className="absolute inset-0 z-10" prefetch={false}>
                             <span className="sr-only">View</span>
                         </a>
                         <div className="bg-secondary rounded-md p-4 flex items-center justify-center">
@@ -110,7 +78,7 @@ export default function Component() {
                         </div>
                     </div>
                     <div className="relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
-                        <a href="/issue/bathroom" className="absolute inset-0 z-10" prefetch={false}>
+                        <a href="/issue/Bathroom" className="absolute inset-0 z-10" prefetch={false}>
                             <span className="sr-only">View</span>
                         </a>
                         <div className="bg-muted rounded-md p-4 flex items-center justify-center">
@@ -122,7 +90,7 @@ export default function Component() {
                         </div>
                     </div>
                     <div className="relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
-                        <a href="/issue/dining" className="absolute inset-0 z-10" prefetch={false}>
+                        <a href="/issue/Dining" className="absolute inset-0 z-10" prefetch={false}>
                             <span className="sr-only">View</span>
                         </a>
                         <div className="bg-card rounded-md p-4 flex items-center justify-center">
@@ -134,45 +102,7 @@ export default function Component() {
                         </div>
                     </div>
                 </section>
-                <hr class="h-px mx-8 my-2 bg-gray-200 border-0 dark:bg-gray-700" />
-                <h1 className="text-4xl font-bold flex items-start justify-start mx-8 mt-8">Details</h1>
-                <div className="mx-8 bg-background p-4 rounded-lg shadow-md">
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-zinc-200">
-                            <thead>
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Section Name</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Device Name</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Device Code</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Description</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Image After Repair</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
-                                {issues.map(issue => (
-                                    <tr key={issue._id}>
-                                        <td className="px-6 py-4 max-w-xs break-words">{issue.sectionName}</td>
-                                        <td className="px-6 py-4 max-w-xs break-words">{issue.deviceName}</td>
-                                        <td className="px-6 py-4 max-w-xs break-words">{issue.deviceCode}</td>
-                                        <td className="px-6 py-4 max-w-xs break-words">{issue.description}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${issue.status === 'Resolved' ? 'bg-green-100 text-green-800' : issue.status === 'Rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                                                {issue.status}
-                                            </span>
-                                        </td>
-                                        {issue.status !== 'Resolved' && (
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <input type="file" onChange={handleFileChange} />
-                                                <button onClick={() => handleUpload(issue._id)} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Upload Resolved Photo</button>
-                                            </td>
-                                        )}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                
             </div>
         </div>
     )
