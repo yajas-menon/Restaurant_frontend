@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://restaurant-backend-khaki.vercel.app', // Adjust the baseURL as needed
+  baseURL: 'http://localhost:8000', // Adjust the baseURL as needed
 });
 
 // Add a request interceptor

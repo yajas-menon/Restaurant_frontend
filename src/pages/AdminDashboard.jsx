@@ -8,6 +8,9 @@ const AdminDashboard = () => {
     const [issues, setIssues] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [remark, setRemark] = useState('');
+    const [selectedIssueId, setSelectedIssueId] = useState(null);
+
     useEffect(() => {
         const fetchIssues = async () => {
             try {
@@ -21,18 +24,38 @@ const AdminDashboard = () => {
         fetchIssues();
     }, []);
 
-
     const handleStatusUpdate = async (issueId, status) => {
         try {
-            setLoading(true)
+            setLoading(true);
             await api.post(`/api/auth/update-status/${issueId}`, { status });
-            setLoading(false)
+            setLoading(false);
             toast.success(`Issue ${status.toLowerCase()} successfully!`);
             const response = await api.get('/api/auth/all');
             setIssues(response.data.data);
         } catch (error) {
-            setLoading(false)
+            setLoading(false);
             toast.error(`Error updating status to ${status}:`, error);
+        }
+    };
+
+    const handleAddRemark = async () => {
+        if (!remark) {
+            toast.error('Please add a remark before submitting.');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            await api.post(`/api/auth/add-remark/${selectedIssueId}`, { remark });
+            setLoading(false);
+            toast.success('Remark added successfully!');
+            setRemark('');
+            setSelectedIssueId(null);
+            const response = await api.get('/api/auth/all');
+            setIssues(response.data.data);
+        } catch (error) {
+            setLoading(false);
+            toast.error('Error adding remark:', error);
         }
     };
 
@@ -43,6 +66,7 @@ const AdminDashboard = () => {
     const closeImageModal = () => {
         setSelectedImage(null);
     };
+
     return (
         <div>
             <Navbar />
@@ -52,7 +76,7 @@ const AdminDashboard = () => {
                 <p className="text-sm md:text-base text-gray-500">Review and approve maintenance tasks.</p>
                 {selectedImage && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
-                        <div className="relative max-w-screen-lg max-h-screen p-4e">
+                        <div className="relative max-w-screen-lg max-h-screen p-4">
                             <img src={selectedImage} alt="Enlarged" className="max-w-full rounded-lg object-contain" />
                             <button onClick={closeImageModal} className="absolute top-2 right-2 font-semibold text-white text-2xl bg-black bg-opacity-50 rounded-full hover:bg-gray-800 px-4 py-2">✕</button>
                         </div>
@@ -67,6 +91,7 @@ const AdminDashboard = () => {
                                 <th className="px-2 md:px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Description</th>
                                 <th className="px-2 md:px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Before Maintenance</th>
                                 <th className="px-2 md:px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">After Maintenance</th>
+                                <th className="px-2 md:px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Remark</th>
                                 <th className="px-2 md:px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Approval</th>
                             </tr>
                         </thead>
@@ -95,8 +120,27 @@ const AdminDashboard = () => {
                                             />
                                         )}
                                     </td>
+                                    <td className="px-2 md:px-6 py-4">
+                                        <input
+                                            type="text"
+                                            value={selectedIssueId === issue._id ? remark : ''}
+                                            onChange={(e) => {
+                                                setSelectedIssueId(issue._id);
+                                                setRemark(e.target.value);
+                                            }}
+                                            placeholder="Add a remark"
+                                            className="w-1/2 h-auto px-2 py-1 text-sm text-black border rounded-md"
+                                        />
+                                      {issue.status !== 'Resolved' &&(  <button
+                                            onClick={handleAddRemark}
+                                            className="bg-blue-700 text-white font-medium py-1 px-2 mt-2 mx-2  rounded hover:bg-blue-800"
+                                        >
+                                            Add Remark
+                                        </button>
+                                      )}
+                                    </td>
                                     <td className="px-2 md:px-6 py-4 whitespace-nowrap">
-                                        {issue.status === 'Pending Approval' && (
+                                        {issue.status !== 'Resolved' ?(
                                             <>
                                                 <button
                                                     onClick={() => handleStatusUpdate(issue._id, 'Resolved')}
@@ -111,6 +155,8 @@ const AdminDashboard = () => {
                                                     Reject
                                                 </button>
                                             </>
+                                        ):(
+                                            "Issue is updated"
                                         )}
                                     </td>
                                 </tr>
@@ -120,8 +166,7 @@ const AdminDashboard = () => {
                 </div>
             </div>
         </div>
-
     )
 }
 
-export default AdminDashboard
+export default AdminDashboard;

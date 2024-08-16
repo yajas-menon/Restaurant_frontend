@@ -55,34 +55,40 @@ const Login = () => {
     }
     const handleLogin = async () => {
       try {
-        setLoading(true)
+        setLoading(true);
         const res = await api.post('/api/auth/login', {
           email: formData.email,
           password: formData.password,
         });
-  
+    
+        if (!res.data.user.isApproved) {
+          setLoading(false);
+          toast.error("Your account approval is pending by the admin.");
+          return;
+        }
+    
         localStorage.setItem('token', res.data.token);
-        
-        console.log(res.data.user.role)
-        // toast.success("Login successful");
         const role = res.data.user.role;
-          login(role);
-          setLoading(false)
-          if(role === "User"){
-            navigate("/dashboard");
-            toast.success("Login sucessful as User")
-          }else if (role === "Admin"){
-            navigate("/admindashboard")
-            toast.success("Login sucessful as Admin")
-          }
-
-        // Redirect or update the UI to indicate the user is logged in
+        login(role);
+        setLoading(false);
+        if (role === "User") {
+          navigate("/dashboard");
+          toast.success("Login successful as User");
+        } else if (role === "Admin") {
+          navigate("/admindashboard");
+          toast.success("Login successful as Admin");
+        }
       } catch (err) {
-        setLoading(false)
-        toast.error("Invalid email or password")
+        setLoading(false);
+        if (err.response && err.response.status === 403) {
+          toast.error(err.response.data.msg); // Show the pending approval message
+        } else {
+          toast.error("Invalid email or password");
+        }
         console.error(err);
       }
     };
+    
     
   return (
     <div>

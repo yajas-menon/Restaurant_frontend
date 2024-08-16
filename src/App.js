@@ -11,6 +11,7 @@ import Dining from './pages/Dining';
 import Room from "./pages/Room"
 import Issues from './pages/issues';
 import AdminDashboard from './pages/AdminDashboard';
+import Settings from './pages/Settings';
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
         {/* <Route exact path='/dining' element={<Dining/>}></Route> */}
         <Route exact path='/issue/:id' element={<Issues/>}></Route>
         <Route exact path='/admindashboard' element={<AdminDashboard/>}></Route>
+        <Route exact path='settings' element={<Settings/>}></Route>
         {/* <Route exact path='/room' element={<Room/>}></Route> */}
 
       </Routes>

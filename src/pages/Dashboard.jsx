@@ -43,13 +43,11 @@ const Dashboard = () => {
     },
   });
   const [sectionMetrics, setSectionMetrics] = useState({});
-  const [sortOrder, setSortOrder] = useState('newest');
 
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
         const response = await api.get('/api/auth/metrics');
-        console.log(response)
         setMetrics(response.data.metrics);
 
         const sectionResponse = await api.get('/api/auth/section-metrics');
@@ -88,7 +86,8 @@ const Dashboard = () => {
         issue.sectionName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         issue.deviceCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
         issue.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        issue.status.toLowerCase().includes(searchTerm.toLowerCase())
+        issue.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        issue.remark.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -189,43 +188,70 @@ const Dashboard = () => {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-zinc-200">
-              <thead>
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Section Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Device Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Device Code</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Description</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Image After Repair</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
-                {filteredIssues.map(issue => (
-                  <tr key={issue._id}>
-                    <td className="px-6 py-4 max-w-xs break-words">{issue.sectionName}</td>
-                    <td className="px-6 py-4 max-w-xs break-words">{issue.deviceName}</td>
-                    <td className="px-6 py-4 max-w-xs break-words">{issue.deviceCode}</td>
-                    <td className="px-6 py-4 max-w-xs break-words">{issue.description}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${issue.status === 'Resolved' ? 'bg-green-100 text-green-800' : issue.status === 'Rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                        {issue.status}
-                      </span>
-                    </td>
-                    {issue.status !== "Resolved" && (
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <input type="file" onChange={handleFileChange} />
-                        <button onClick={() => handleUpload(issue._id)} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Upload Resolved Photo</button>
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <table className="min-w-full divide-y divide-zinc-200">
+  <thead>
+    <tr>
+      <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Section Name</th>
+      <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Device Name</th>
+      <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Description</th>
+      <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Status</th>
+      <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Remark</th>
+      <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Image After Repair</th>
+      <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Updated At</th>
+    </tr>
+  </thead>
+  <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
+    {filteredIssues.map((issue) => (
+      <tr key={issue._id}>
+        <td className="px-6 py-4 max-w-xs break-words">{issue.sectionName || "N/A"}</td>
+        <td className="px-6 py-4 max-w-xs break-words">{issue.deviceName || "N/A"}</td>
+        <td className="px-6 py-4 max-w-xs break-words">{issue.description || "N/A"}</td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          <span
+            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+              issue.status === "Resolved"
+                ? "bg-green-100 text-green-800"
+                : issue.status === "Rejected"
+                ? "bg-red-100 text-red-800"
+                : "bg-yellow-100 text-yellow-800"
+            }`}
+          >
+            {issue.status || "N/A"}
+          </span>
+        </td>
+        <td className="px-6 py-4 max-w-xs break-words">
+          {issue.remark || "No Remarks"}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          {issue.status !== "Resolved" ? (
+            <>
+              <input
+                type="file"
+                onChange={handleFileChange}
+                className="p-2 w-1/2 text-white rounded-lg"
+              />
+              <button
+                onClick={() => handleUpload(issue._id)}
+                className="mt-2 bg-blue-700 text-white p-2 rounded-lg"
+              >
+                Upload
+              </button>
+            </>
+          ) : (
+            "Issue is resolved"
+          )}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          {issue.updatedAt ? new Date(issue.updatedAt).toLocaleDateString() : "N/A"}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
         </div>
 
       </div>
+    </div>
     </div>
   );
 };
