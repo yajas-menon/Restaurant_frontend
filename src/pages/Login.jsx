@@ -233,7 +233,7 @@ const Login = () => {
             <div className="flex items-center mb-6">
               <h1 className="text-2xl font-bold">InnuxAI</h1>
             </div>
-            <h2 className="text-4xl font-bold mb-6">Your AI Partner for Streamlined Hotel Management </h2>
+            <h2 className="text-4xl font-bold mb-6">Your AI Partner for Streamlined Intelligent Maintenance </h2>
             <p className="text-lg">Streamline your workflows and enhance productivity with our AI-powered solutions.</p>
           </div>
         </div>

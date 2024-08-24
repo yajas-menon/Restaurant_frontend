@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Line, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -7,125 +7,128 @@ import {
   LinearScale,
   PointElement,
   BarElement,
-  ArcElement,
   Tooltip,
   Legend,
 } from "chart.js";
+import api from "../utils/api";
 
 ChartJS.register(
   LineElement,
   CategoryScale,
   BarElement,
   LinearScale,
-  PointElement
+  PointElement,
+  Tooltip,
+  Legend
 );
 
 const GraphComponent1 = () => {
-  const data = {
-    labels: ["January", "February", "March", "April", "May", "June", "July"],
-    datasets: [
-      {
-        label: "Line Dataset 1",
-        type: "line",
-        data: [23, 11, 22, 27, 13, 37, 21],
-        fill: false,
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-        borderColor: "rgba(255, 99, 132, 1)",
-        yAxisID: "y-axis-1",
-      },
-      {
-        label: "Line Dataset 2",
-        type: "line",
-        data: [30, 25, 36, 30, 45, 64, 52],
-        fill: false,
-        borderColor: "rgba(54, 162, 235, 1)",
-        yAxisID: "y-axis-2",
-      },
-    ],
-  };
+  // Initialize the data with an empty datasets array
+  const [lineData, setLineData] = useState({
+    labels: [],
+    datasets: [],
+  });
+  const [barData, setBarData] = useState({
+    labels: [],
+    datasets: [],
+  });
 
-  const options = {};
+  useEffect(() => {
+    fetchLineData();
+    fetchBarData();
+  }, []);
 
-  const data1 = {
-    labels: ["January", "February", "March", "April", "May", "June", "July"],
-    datasets: [
-      {
-        label: "Bar Dataset 1",
-        type: "bar",
-        data: [65, 59, 80, 81, 56, 55, 40],
-        fill: false,
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-        borderColor: "rgba(255, 99, 132, 1)",
-        yAxisID: "y-axis-1",
-      },
-      {
-        label: "Line Dataset 2",
-        type: "bar",
-        data: [30, 50, 10, 60, 40, 70, 90],
-        fill: false,
-        borderColor: "rgba(54, 162, 235, 1)",
-        yAxisID: "y-axis-2",
-      },
-    ],
-  };
+  const fetchLineData = async () => {
+    try {
+      const response = await api.get('/api/auth/total-issues');
+      const totalIssues = response.data.totalIssues;
+      console.log(totalIssues)
 
-  const options1 = {
-    scales: {
-      yAxes: [
-        {
-          type: "linear",
-          display: true,
-          position: "left",
-          id: "y-axis-1",
-        },
-        {
-          type: "linear",
-          display: true,
-          position: "right",
-          id: "y-axis-2",
-          gridLines: {
-            drawOnChartArea: false,
+      // Update line data with fetched total issues
+      setLineData({
+        labels: ["January", "February", "March", "April", "May", "June", "July"],
+        datasets: [
+          {
+            label: "Total Issues",
+            type: "line",
+            data: [totalIssues, totalIssues, totalIssues, totalIssues, totalIssues, totalIssues, totalIssues], // Example data
+            fill: false,
+            backgroundColor: "rgba(255, 99, 132, 0.2)",
+            borderColor: "rgba(255, 99, 132, 1)",
+            yAxisID: "y-axis-1",
           },
-        },
-      ],
-    },
+        ],
+      });
+    } catch (err) {
+      console.error("Error fetching line data", err);
+    }
+  };
+
+  const fetchBarData = async () => {
+    try {
+      const response = await api.get('/api/auth/issues-status');
+      const issuesStatus = response.data;
+
+      setBarData({
+        labels: ["Pending", "Open", "Pending Approval","Resolved","Rejected"],
+        datasets: [
+          {
+            label: "Issues WIP",
+            type: "bar",
+            data: [
+              issuesStatus["Pending"] || 0,
+              issuesStatus["Open"] || 0,
+              issuesStatus["Pending Approval"] || 0,
+              issuesStatus["Resolved"] || 0,
+              issuesStatus['Rejected'] || 0
+            ],
+            fill: false,
+            backgroundColor: "rgba(54, 162, 235, 0.2)",
+            borderColor: "rgba(54, 162, 235, 1)",
+            yAxisID: "y-axis-1",
+          },
+        ],
+      });
+    } catch (err) {
+      console.error("Error fetching bar data", err);
+    }
   };
 
   return (
-    <div>
-      <body class="bg-gray-900 p-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-gray-800 p-6 rounded-lg shadow">
-            <div class="flex justify-between items-center mb-4">
+    <div className="mt-20">
+      <div className="bg-white p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white p-6 rounded-lg shadow">
+            <div className="flex justify-between items-center mb-4">
               <div>
-                <h2 class="text-lg text-white font-semibold">Issues Impacted</h2>
-                <hr className="h-px bg-white border-0 "></hr>
+                <h2 className="text-lg text-black font-semibold">Issues Impacted</h2>
+                <hr className="h-px bg-black border-0"></hr>
               </div>
-              <select class="border border-black text-black p-1 rounded">
+              <select className="border border-black text-black p-1 rounded">
                 <option>Day</option>
                 <option selected>Week</option>
                 <option>Month</option>
               </select>
             </div>
-            <Line data={data} options={options} />
+            {lineData.datasets.length > 0 && <Line data={lineData} />}
           </div>
 
-          <div class="bg-gray-800 p-6 rounded-lg shadow">
-            <div class="flex justify-between items-center mb-4">
+          <div className="bg-white p-6 rounded-lg shadow">
+            <div className="flex justify-between items-center mb-4">
               <div>
-                <h2 class="text-lg text-white font-semibold">Issues WIP</h2>
-                <hr className="h-px bg-white border-0 " />
+                <h2 className="text-lg text-black font-semibold">Issues WIP</h2>
+                <hr className="h-px bg-black border-0" />
               </div>
-              <select class="border text-black border-black p-1 rounded">
+              <select className="border text-black border-black p-1 rounded">
                 <option>This Week</option>
                 <option>Last Week</option>
                 <option>This Month</option>
               </select>
             </div>
-            <Bar data={data1} options={options1} />
+            {barData.datasets.length > 0 && <Bar data={barData} />}
           </div>
         </div>
-      </body>
+      </div>
     </div>
   );
 };

@@ -17,48 +17,12 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState('bulbs');
   const [metrics, setMetrics] = useState({
-    issueFixed: {
-      bulbs: 12,
-      wifi: 10,
-      acs: 15,
-      taps: 8,
-    },
-    openIssues: {
-      bulbs: 2,
-      wifi: 1,
-      acs: 4,
-      taps: 3,
-    },
-    rejectedIssues: {
-      bulbs: 1,
-      wifi: 0,
-      acs: 3,
-      taps: 4,
-    },
-    pendingIssues: {
-      bulbs: 0,
-      wifi: 0,
-      acs: 0,
-      taps: 0,
-    },
+    issueFixed: 0,
+    openIssues: 0,
+    rejectedIssues: 0,
+    pendingIssues: 0,
   });
-  const [sectionMetrics, setSectionMetrics] = useState({});
 
-  useEffect(() => {
-    const fetchMetrics = async () => {
-      try {
-        const response = await api.get('/api/auth/metrics');
-        setMetrics(response.data.metrics);
-
-        const sectionResponse = await api.get('/api/auth/section-metrics');
-        setSectionMetrics(sectionResponse.data.metrics);
-      } catch (error) {
-        console.error('Error fetching metrics:', error);
-      }
-    };
-
-    fetchMetrics();
-  }, []);
 
   useEffect(() => {
     const fetchIssues = async () => {
@@ -72,8 +36,20 @@ const Dashboard = () => {
       }
     };
 
+    const fetchMetrics = async () => {
+      try {
+        const response = await api.get('/api/auth/summary'); // New route
+        setMetrics(response.data);
+      } catch (error) {
+        console.error('Error fetching metrics:', error);
+      }
+    };
+
     fetchIssues();
+    fetchMetrics();
   }, []);
+
+  
 
 
   useEffect(() => {
@@ -137,18 +113,18 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mx-4 mt-8">
           <div className="bg-gray-800 p-4 rounded-lg shadow-md">
             <h2 className="text-2xl text-white mb-4">Issues Fixed</h2>
-            <p className="text-4xl text-white">{metrics.issueFixed[selectedMetric]}</p>
+            <p className="text-4xl text-white">{metrics.issueFixed}</p>
 
           </div>
 
           <div className="bg-gray-800 p-4 rounded-lg shadow-md">
             <h2 className="text-2xl text-white mb-4">Open Issues</h2>
-            <p className="text-4xl text-white">{metrics.openIssues[selectedMetric]}</p>
+            <p className="text-4xl text-white">{metrics.openIssues}</p>
 
           </div>
           <div className="bg-gray-800 p-4 rounded-lg shadow-md">
             <h2 className="text-2xl text-white mb-4">Rejected Issues</h2>
-            <p className="text-4xl text-white">{metrics.rejectedIssues[selectedMetric]}</p>
+            <p className="text-4xl text-white">{metrics.rejectedIssues}</p>
 
           </div>
 
@@ -257,3 +233,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+

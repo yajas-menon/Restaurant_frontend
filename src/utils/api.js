@@ -1,6 +1,6 @@
 // src/utils/api.js
 import axios from 'axios';
-
+// https://restaurant-backend-khaki.vercel.app
 const api = axios.create({
   baseURL: 'https://restaurant-backend-khaki.vercel.app', // Adjust the baseURL as needed
 });

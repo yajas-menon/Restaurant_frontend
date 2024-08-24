@@ -3,6 +3,7 @@ import api from '../utils/api'
 import Navbar from '../components/Navbar';
 import { toast } from 'react-toastify';
 import Loader from '../components/Loader';
+import GraphComponent1 from '../components/GraphComponent1';
 
 const AdminDashboard = () => {
     const [issues, setIssues] = useState([]);
@@ -71,6 +72,9 @@ const AdminDashboard = () => {
         <div>
             <Navbar />
             <Loader isLoading={loading} />
+            <div>
+                <GraphComponent1/>
+            </div>
             <div className="mx-4 md:mx-8 mt-20 md:mt-28 bg-background p-4 rounded-lg shadow-md">
                 <h1 className="text-2xl md:text-4xl font-medium">Maintenance Tasks</h1>
                 <p className="text-sm md:text-base text-gray-500">Review and approve maintenance tasks.</p>
